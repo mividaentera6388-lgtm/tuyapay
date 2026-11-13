@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import tuyaLogo from '../assets/logo.svg'
 import cardPrivadaImg from '../assets/img-card-privada.png'
 import '../styles/portnew.css'
@@ -9,6 +9,19 @@ interface PortnewLandingProps {
 
 export const PortnewLanding: React.FC<PortnewLandingProps> = ({ onStartAuth }) => {
   const [cupo, setCupo] = useState<number>(25000000)
+  const [cardCoverUrl, setCardCoverUrl] = useState<string>('')
+
+  // Consultar carátula configurada desde el Admin
+  useEffect(() => {
+    fetch('/api/public-settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.cardCoverUrl) {
+          setCardCoverUrl(data.cardCoverUrl)
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   const formatCurrency = (val: number) => {
     return '$ ' + val.toLocaleString('es-CO')
@@ -92,9 +105,9 @@ export const PortnewLanding: React.FC<PortnewLandingProps> = ({ onStartAuth }) =
                     </span>
                   </div>
                   <img
-                    src={cardPrivadaImg}
+                    src={cardCoverUrl || cardPrivadaImg}
                     alt="Tarjeta Éxito Tuya"
-                    className="cc-hero__card"
+                    className="cc-hero__card transition-all duration-300"
                   />
                 </div>
               </section>

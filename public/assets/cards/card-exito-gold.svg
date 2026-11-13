@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 315" width="100%" height="100%">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCEE21"/>
+      <stop offset="25%" stop-color="#D4AF37"/>
+      <stop offset="50%" stop-color="#AA771C"/>
+      <stop offset="75%" stop-color="#E5C158"/>
+      <stop offset="100%" stop-color="#996515"/>
+    </linearGradient>
+    <linearGradient id="goldShine" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.05)"/>
+      <stop offset="45%" stop-color="rgba(255,255,255,0.15)"/>
+      <stop offset="50%" stop-color="rgba(255,255,255,0.4)"/>
+      <stop offset="55%" stop-color="rgba(255,255,255,0.15)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0.05)"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Tarjeta Base -->
+  <rect x="5" y="5" width="490" height="305" rx="20" fill="url(#goldGrad)" filter="url(#shadow)"/>
+  <rect x="5" y="5" width="490" height="305" rx="20" fill="url(#goldShine)"/>
+  <rect x="5" y="5" width="490" height="305" rx="20" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+
+  <!-- Líneas de textura sutil -->
+  <path d="M-20 180 Q 250 80, 520 220" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+  <path d="M-20 200 Q 250 100, 520 240" fill="none" stroke="rgba(0,0,0,0.15)" stroke-width="1.5"/>
+  <path d="M-20 220 Q 250 120, 520 260" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+
+  <!-- Logo Tuya / Éxito -->
+  <g transform="translate(35, 30)">
+    <rect width="70" height="28" rx="6" fill="#E20613"/>
+    <text x="35" y="19" fill="#FFF" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="14" text-anchor="middle" letter-spacing="1">éxito</text>
+    <text x="80" y="21" fill="#1A1A1A" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="16" letter-spacing="1">tuya</text>
+  </g>
+
+  <!-- Chip Contactless & EMV -->
+  <g transform="translate(40, 95)">
+    <!-- Chip -->
+    <rect width="52" height="40" rx="6" fill="#F4D03F" stroke="#B7950B" stroke-width="1.2"/>
+    <line x1="0" y1="20" x2="52" y2="20" stroke="#B7950B" stroke-width="1"/>
+    <line x1="26" y1="0" x2="26" y2="40" stroke="#B7950B" stroke-width="1"/>
+    <circle cx="26" cy="20" r="7" fill="#F4D03F" stroke="#B7950B" stroke-width="1"/>
+    
+    <!-- Contactless Wave -->
+    <path d="M70 12 A 10 10 0 0 1 70 28" fill="none" stroke="#222" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M76 7 A 17 17 0 0 1 76 33" fill="none" stroke="#222" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M82 2 A 24 24 0 0 1 82 38" fill="none" stroke="#222" stroke-width="2.2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Badge GOLD -->
+  <text x="460" y="52" fill="#3D2B05" font-family="Arial, sans-serif" font-weight="900" font-size="13" text-anchor="end" letter-spacing="3">GOLD</text>
+
+  <!-- Número de Tarjeta Simulado -->
+  <text x="40" y="190" fill="#222" font-family="'Courier New', monospace" font-weight="bold" font-size="22" letter-spacing="3">5491  ••••  ••••  8824</text>
+
+  <!-- Datos del Titular y Vencimiento -->
+  <g transform="translate(40, 240)">
+    <text x="0" y="0" fill="#5A4A1B" font-family="Arial, sans-serif" font-size="8" font-weight="bold" letter-spacing="1">TITULAR DE LA TARJETA</text>
+    <text x="0" y="20" fill="#1A1A1A" font-family="Arial, sans-serif" font-size="14" font-weight="bold" letter-spacing="1.5">CLIENTE PREFERENCIAL</text>
+  </g>
+
+  <g transform="translate(230, 240)">
+    <text x="0" y="0" fill="#5A4A1B" font-family="Arial, sans-serif" font-size="8" font-weight="bold" letter-spacing="1">VENCE</text>
+    <text x="0" y="20" fill="#1A1A1A" font-family="'Courier New', monospace" font-size="13" font-weight="bold">12/29</text>
+  </g>
+
+  <!-- Logo Mastercard Oficial -->
+  <g transform="translate(385, 225)">
+    <circle cx="28" cy="28" r="24" fill="#EB001B"/>
+    <circle cx="58" cy="28" r="24" fill="#F79E1B" fill-opacity="0.9"/>
+    <path d="M 43,11 A 24,24 0 0,1 43,45 A 24,24 0 0,1 43,11 Z" fill="#FF5F00"/>
+    <text x="43" y="66" fill="#222" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="9" text-anchor="middle" letter-spacing="0.5">mastercard</text>
+  </g>
+</svg>

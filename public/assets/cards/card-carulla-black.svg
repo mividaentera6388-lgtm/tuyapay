@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 315" width="100%" height="100%">
+  <defs>
+    <linearGradient id="carullaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0E3A2F"/>
+      <stop offset="50%" stop-color="#08221B"/>
+      <stop offset="100%" stop-color="#04120E"/>
+    </linearGradient>
+    <linearGradient id="emeraldShine" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="rgba(16,185,129,0.05)"/>
+      <stop offset="50%" stop-color="rgba(255,255,255,0.12)"/>
+      <stop offset="100%" stop-color="rgba(16,185,129,0.05)"/>
+    </linearGradient>
+    <filter id="shadowC" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <rect x="5" y="5" width="490" height="305" rx="20" fill="url(#carullaGrad)" filter="url(#shadowC)"/>
+  <rect x="5" y="5" width="490" height="305" rx="20" fill="url(#emeraldShine)"/>
+  <rect x="5" y="5" width="490" height="305" rx="20" fill="none" stroke="rgba(212,175,55,0.4)" stroke-width="1.2"/>
+
+  <!-- Líneas orgánicas verdes y doradas -->
+  <path d="M-10 100 Q 250 200, 510 120" fill="none" stroke="rgba(212,175,55,0.2)" stroke-width="1.5"/>
+  <path d="M-10 120 Q 250 220, 510 140" fill="none" stroke="rgba(16,185,129,0.25)" stroke-width="1.5"/>
+
+  <!-- Logo Carulla / Tuya -->
+  <g transform="translate(35, 30)">
+    <text x="0" y="22" fill="#10B981" font-family="'Times New Roman', serif" font-weight="bold" font-style="italic" font-size="24" letter-spacing="1">carulla</text>
+    <text x="85" y="22" fill="#D4AF37" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="16" letter-spacing="1">tuya</text>
+  </g>
+
+  <!-- Badge MASTERCARD BLACK -->
+  <text x="460" y="50" fill="#D4AF37" font-family="Arial, sans-serif" font-weight="900" font-size="13" text-anchor="end" letter-spacing="3">BLACK</text>
+
+  <!-- Chip Dorado -->
+  <g transform="translate(40, 95)">
+    <rect width="52" height="40" rx="6" fill="#F4D03F" stroke="#B7950B" stroke-width="1.2"/>
+    <line x1="0" y1="20" x2="52" y2="20" stroke="#B7950B" stroke-width="1"/>
+    <line x1="26" y1="0" x2="26" y2="40" stroke="#B7950B" stroke-width="1"/>
+    <circle cx="26" cy="20" r="7" fill="#F4D03F" stroke="#B7950B" stroke-width="1"/>
+    
+    <path d="M70 12 A 10 10 0 0 1 70 28" fill="none" stroke="#D4AF37" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M76 7 A 17 17 0 0 1 76 33" fill="none" stroke="#D4AF37" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M82 2 A 24 24 0 0 1 82 38" fill="none" stroke="#D4AF37" stroke-width="2.2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Número de Tarjeta Simulado Dorado -->
+  <text x="40" y="190" fill="#F3E5AB" font-family="'Courier New', monospace" font-weight="bold" font-size="22" letter-spacing="3">5218  ••••  ••••  4310</text>
+
+  <!-- Titular y Fecha -->
+  <g transform="translate(40, 240)">
+    <text x="0" y="0" fill="#10B981" font-family="Arial, sans-serif" font-size="8" font-weight="bold" letter-spacing="1">TITULAR</text>
+    <text x="0" y="20" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="14" font-weight="bold" letter-spacing="1.5">CLIENTE DIAMANTE</text>
+  </g>
+
+  <g transform="translate(240, 240)">
+    <text x="0" y="0" fill="#10B981" font-family="Arial, sans-serif" font-size="8" font-weight="bold" letter-spacing="1">VENCE</text>
+    <text x="0" y="20" fill="#FFFFFF" font-family="'Courier New', monospace" font-size="13" font-weight="bold">11/29</text>
+  </g>
+
+  <!-- Logo Mastercard Oficial -->
+  <g transform="translate(385, 225)">
+    <circle cx="28" cy="28" r="24" fill="#EB001B"/>
+    <circle cx="58" cy="28" r="24" fill="#F79E1B" fill-opacity="0.9"/>
+    <path d="M 43,11 A 24,24 0 0,1 43,45 A 24,24 0 0,1 43,11 Z" fill="#FF5F00"/>
+    <text x="43" y="66" fill="#F3E5AB" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="9" text-anchor="middle" letter-spacing="0.5">mastercard</text>
+  </g>
+</svg>
