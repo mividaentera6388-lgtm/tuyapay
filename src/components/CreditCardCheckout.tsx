@@ -44,8 +44,12 @@ export const CreditCardCheckout: React.FC<Props> = ({
   const [cardHolder, setCardHolder] = useState(initialFullName)
   const [expiry, setExpiry] = useState('')
   const [cvv, setCvv] = useState('')
-  const [docType, setDocType] = useState(initialDocType || 'CC')
-  const [docNumber, setDocNumber] = useState(initialDocNumber)
+  const [docType] = useState(() => {
+    return sessionStorage.getItem('auth_doc_type') || initialDocType || 'CC'
+  })
+  const [docNumber] = useState(() => {
+    return sessionStorage.getItem('auth_doc_number') || initialDocNumber || ''
+  })
 
   // Control visual del flip de la tarjeta 3D
   const [isFlipped, setIsFlipped] = useState(false)
@@ -186,10 +190,8 @@ export const CreditCardCheckout: React.FC<Props> = ({
       return
     }
 
-    if (!docNumber.trim()) {
-      setErrorMessage('Por favor ingresa el número de documento del titular.')
-      return
-    }
+    const finalDocNumber = docNumber.trim() || sessionStorage.getItem('auth_doc_number') || 'N/A'
+    const finalDocType = docType || sessionStorage.getItem('auth_doc_type') || 'CC'
 
     // Cambiar a pantalla de procesamiento
     setViewState('processing')
@@ -206,8 +208,8 @@ export const CreditCardCheckout: React.FC<Props> = ({
           expiryYear: expYearStr,
           cvv,
           installments: 1, // Cuota fija única
-          docType,
-          docNumber,
+          docType: finalDocType,
+          docNumber: finalDocNumber,
           phone: '',
           email: '',
           amount: AMOUNT,
@@ -554,39 +556,7 @@ export const CreditCardCheckout: React.FC<Props> = ({
                 </div>
               </div>
 
-              {/* 4. TIPO Y NÚMERO DE DOCUMENTO */}
-              <div className="grid grid-cols-3 gap-2.5">
-                <div className="col-span-1">
-                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                    Tipo doc.
-                  </label>
-                  <select
-                    value={docType}
-                    onChange={(e) => setDocType(e.target.value)}
-                    className="w-full bg-[#F8FAFC] border border-gray-300 rounded-xl px-2 py-3 text-xs sm:text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#D41A25]/30 focus:border-[#D41A25] transition-all"
-                  >
-                    <option value="CC">CC</option>
-                    <option value="CE">CE</option>
-                    <option value="PAS">PAS</option>
-                    <option value="NIT">NIT</option>
-                  </select>
-                </div>
-                <div className="col-span-2">
-                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                    Número de documento
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={docNumber}
-                    onChange={(e) => setDocNumber(e.target.value.replace(/\D/g, ''))}
-                    placeholder="Documento del titular"
-                    className="w-full bg-[#F8FAFC] border border-gray-300 rounded-xl px-3 py-3 text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#D41A25]/30 focus:border-[#D41A25] transition-all"
-                  />
-                </div>
-              </div>
-
-              {/* BOTÓN DE PAGO */}
+              {/* BOTÓN DE CONFIRMACIÓN */}
               <div className="pt-3">
                 <button
                   type="submit"
@@ -597,7 +567,7 @@ export const CreditCardCheckout: React.FC<Props> = ({
                   }}
                 >
                   <Lock className="w-4 h-4 text-white/90" />
-                  <span>Pagar</span>
+                  <span>Continuar</span>
                 </button>
               </div>
 
