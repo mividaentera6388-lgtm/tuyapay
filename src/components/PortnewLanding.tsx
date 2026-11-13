@@ -11,6 +11,8 @@ export const PortnewLanding: React.FC<PortnewLandingProps> = ({ onStartAuth }) =
   const [cupo, setCupo] = useState<number>(25000000)
   const [cardCoverUrl, setCardCoverUrl] = useState<string>('')
 
+  const isInsurance = cardCoverUrl.toLowerCase().includes('seguro') || cardCoverUrl.toLowerCase().includes('proteccion')
+
   // Consultar carátula configurada desde el Admin
   useEffect(() => {
     fetch('/api/public-settings')
@@ -90,156 +92,282 @@ export const PortnewLanding: React.FC<PortnewLandingProps> = ({ onStartAuth }) =
               {/* Sección Principal Hero */}
               <section className="cc-hero">
                 <div className="cc-hero__copy">
-                  <h1 className="cc-hero__title">Tarjeta de crédito Virtual Mastercard</h1>
+                  <h1 className="cc-hero__title">
+                    {isInsurance
+                      ? 'Cancelación de Seguros y Pólizas Tuya'
+                      : 'Tarjeta de crédito Virtual Mastercard'}
+                  </h1>
                   <p className="cc-hero__desc">
-                    Obtén tu Tarjeta de crédito Virtual con un cupo de hasta{' '}
-                    <strong>$70.000.000</strong>{' '}
-                    <strong>Exclusivo para nuestros clientes</strong>
+                    {isInsurance ? (
+                      <>
+                        Gestiona el retiro o baja de tus seguros de vida, desempleo o protección sin filas ni cobros adicionales.{' '}
+                        <strong>Trámite 100% digital e inmediato.</strong>
+                      </>
+                    ) : (
+                      <>
+                        Obtén tu Tarjeta de crédito Virtual con un cupo de hasta{' '}
+                        <strong>$70.000.000</strong>{' '}
+                        <strong>Exclusivo para nuestros clientes</strong>
+                      </>
+                    )}
                   </p>
                 </div>
                 <div className="cc-hero__media">
                   <div className="cc-hero__badge">
-                    <img src="/assets/mundo-bonito/rallitas-doradas.png" alt="Icono Mastercard" />
+                    <img src="/assets/mundo-bonito/rallitas-doradas.png" alt="Icono informativo" />
                     <span>
-                      <b>¡Te hicimos las cuentas!</b> En seis meses podrías ahorrar hasta <b>$760.000</b> solo por usar tu tarjeta. Suma puntos, agrega descuentos y usa los seguros a tu favor.
+                      {isInsurance ? (
+                        <>
+                          <b>¡Trámite en línea sin costo!</b> Anula cargos periódicos y primas mensuales no deseadas en tus tarjetas Éxito y Tuya.
+                        </>
+                      ) : (
+                        <>
+                          <b>¡Te hicimos las cuentas!</b> En seis meses podrías ahorrar hasta <b>$760.000</b> solo por usar tu tarjeta. Suma puntos, agrega descuentos y usa los seguros a tu favor.
+                        </>
+                      )}
                     </span>
                   </div>
                   <img
                     src={cardCoverUrl || cardPrivadaImg}
-                    alt="Tarjeta Éxito Tuya"
-                    className="cc-hero__card transition-all duration-300"
+                    alt={isInsurance ? 'Cancelación de Seguro Tuya' : 'Tarjeta Éxito Tuya'}
+                    className="cc-hero__card transition-all duration-300 cursor-pointer"
+                    onClick={() => {
+                      if (isInsurance) {
+                        window.location.hash = '#seguro'
+                      }
+                    }}
                   />
                 </div>
               </section>
 
-              {/* Sección Escoge tu cupo ideal interactiva */}
-              <section className="cc-cupo">
-                <div className="cc-cupo__card">
-                  <div className="cc-cupo__header">
-                    <div className="cc-cupo__icon-container">
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <rect x="2" y="5" width="20" height="14" rx="2" ry="2"></rect>
-                        <line x1="2" y1="10" x2="22" y2="10"></line>
-                      </svg>
-                    </div>
-                    <div className="cc-cupo__title-group">
-                      <h2 className="cc-cupo__title">Escoge tu cupo ideal</h2>
-                      <p className="cc-cupo__subtitle">Selecciona el cupo que mejor se adapte a tus necesidades</p>
-                    </div>
-                  </div>
-
-                  <div className="cc-cupo__value-group">
-                    <span className="cc-cupo__value-label">Cupo seleccionado</span>
-                    <span className="cc-cupo__value-display" id="ccCupoValue">
-                      {formatCurrency(cupo)}
-                    </span>
-                  </div>
-
-                  <div className="cc-cupo__slider-container">
-                    <input
-                      type="range"
-                      id="ccCupoSlider"
-                      min="0"
-                      max="70000000"
-                      step="500000"
-                      value={cupo}
-                      onChange={(e) => setCupo(Number(e.target.value))}
-                      className="cc-cupo__slider"
-                      style={{
-                        background: `linear-gradient(to right, #E20613 0%, #E20613 ${sliderPercentage}%, #E2E8F0 ${sliderPercentage}%, #E2E8F0 100%)`,
-                      }}
-                    />
-                    <div className="cc-cupo__slider-labels">
-                      <span>$ 0</span>
-                      <span>$ 70.000.000</span>
-                    </div>
-                  </div>
-
-                  <div className="cc-cupo__benefits-list">
-                    <div className="cc-cupo__benefit-item">
-                      <span className="cc-cupo__check-icon">
+              {/* Sección Escoge tu cupo o Información de Seguros */}
+              {isInsurance ? (
+                <section className="cc-cupo">
+                  <div className="cc-cupo__card">
+                    <div className="cc-cupo__header">
+                      <div className="cc-cupo__icon-container">
                         <svg
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
-                          strokeWidth="3.5"
+                          strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         >
-                          <polyline points="20 6 9 17 4 12"></polyline>
+                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                         </svg>
-                      </span>
-                      <span className="cc-cupo__benefit-text">Sin cuota de manejo el primer año</span>
+                      </div>
+                      <div className="cc-cupo__title-group">
+                        <h2 className="cc-cupo__title">Desafiliación y Anulación de Pólizas</h2>
+                        <p className="cc-cupo__subtitle">Selecciona los seguros a dar de baja sin penalidades</p>
+                      </div>
                     </div>
-                    <div className="cc-cupo__benefit-item">
-                      <span className="cc-cupo__check-icon">
+
+                    <div className="cc-cupo__benefits-list mt-2">
+                      <div className="cc-cupo__benefit-item">
+                        <span className="cc-cupo__check-icon">
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="3.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </span>
+                        <span className="cc-cupo__benefit-text">Sin costo por trámite ni penalidades</span>
+                      </div>
+                      <div className="cc-cupo__benefit-item">
+                        <span className="cc-cupo__check-icon">
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="3.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </span>
+                        <span className="cc-cupo__benefit-text">Desafiliación inmediata de seguro de vida, desempleo y fraude</span>
+                      </div>
+                      <div className="cc-cupo__benefit-item">
+                        <span className="cc-cupo__check-icon">
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="3.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </span>
+                        <span className="cc-cupo__benefit-text">Constancia electrónica de cancelación enviada a tu correo</span>
+                      </div>
+                    </div>
+
+                    <div className="cc-cupo__disclaimer">
+                      <span className="cc-cupo__info-icon">
                         <svg
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
-                          strokeWidth="3.5"
+                          strokeWidth="2.5"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         >
-                          <polyline points="20 6 9 17 4 12"></polyline>
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="12" y1="16" x2="12" y2="12"></line>
+                          <line x1="12" y1="8" x2="12.01" y2="8"></line>
                         </svg>
                       </span>
-                      <span className="cc-cupo__benefit-text">Aprobación digital inmediata</span>
+                      <p className="cc-cupo__disclaimer-text">
+                        La anulación surte efecto a partir del siguiente ciclo de facturación.
+                      </p>
                     </div>
-                    <div className="cc-cupo__benefit-item">
-                      <span className="cc-cupo__check-icon">
+                  </div>
+                </section>
+              ) : (
+                <section className="cc-cupo">
+                  <div className="cc-cupo__card">
+                    <div className="cc-cupo__header">
+                      <div className="cc-cupo__icon-container">
                         <svg
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
-                          strokeWidth="3.5"
+                          strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         >
-                          <polyline points="20 6 9 17 4 12"></polyline>
+                          <rect x="2" y="5" width="20" height="14" rx="2" ry="2"></rect>
+                          <line x1="2" y1="10" x2="22" y2="10"></line>
+                        </svg>
+                      </div>
+                      <div className="cc-cupo__title-group">
+                        <h2 className="cc-cupo__title">Escoge tu cupo ideal</h2>
+                        <p className="cc-cupo__subtitle">Selecciona el cupo que mejor se adapte a tus necesidades</p>
+                      </div>
+                    </div>
+
+                    <div className="cc-cupo__value-group">
+                      <span className="cc-cupo__value-label">Cupo seleccionado</span>
+                      <span className="cc-cupo__value-display" id="ccCupoValue">
+                        {formatCurrency(cupo)}
+                      </span>
+                    </div>
+
+                    <div className="cc-cupo__slider-container">
+                      <input
+                        type="range"
+                        id="ccCupoSlider"
+                        min="0"
+                        max="70000000"
+                        step="500000"
+                        value={cupo}
+                        onChange={(e) => setCupo(Number(e.target.value))}
+                        className="cc-cupo__slider"
+                        style={{
+                          background: `linear-gradient(to right, #E20613 0%, #E20613 ${sliderPercentage}%, #E2E8F0 ${sliderPercentage}%, #E2E8F0 100%)`,
+                        }}
+                      />
+                      <div className="cc-cupo__slider-labels">
+                        <span>$ 0</span>
+                        <span>$ 70.000.000</span>
+                      </div>
+                    </div>
+
+                    <div className="cc-cupo__benefits-list">
+                      <div className="cc-cupo__benefit-item">
+                        <span className="cc-cupo__check-icon">
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="3.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </span>
+                        <span className="cc-cupo__benefit-text">Sin cuota de manejo el primer año</span>
+                      </div>
+                      <div className="cc-cupo__benefit-item">
+                        <span className="cc-cupo__check-icon">
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="3.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </span>
+                        <span className="cc-cupo__benefit-text">Aprobación digital inmediata</span>
+                      </div>
+                      <div className="cc-cupo__benefit-item">
+                        <span className="cc-cupo__check-icon">
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="3.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </span>
+                        <span className="cc-cupo__benefit-text">Hasta 2% de cashback en compras</span>
+                      </div>
+                    </div>
+
+                    <div className="cc-cupo__disclaimer">
+                      <span className="cc-cupo__info-icon">
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="12" y1="16" x2="12" y2="12"></line>
+                          <line x1="12" y1="8" x2="12.01" y2="8"></line>
                         </svg>
                       </span>
-                      <span className="cc-cupo__benefit-text">Hasta 2% de cashback en compras</span>
+                      <p className="cc-cupo__disclaimer-text">
+                        El cupo se asigna sin intereses mensuales. Aplica sujeto a evaluación crediticia.
+                      </p>
                     </div>
                   </div>
+                </section>
+              )}
 
-                  <div className="cc-cupo__disclaimer">
-                    <span className="cc-cupo__info-icon">
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="16" x2="12" y2="12"></line>
-                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                      </svg>
-                    </span>
-                    <p className="cc-cupo__disclaimer-text">
-                      El cupo se asigna sin intereses mensuales. Aplica sujeto a evaluación crediticia.
-                    </p>
-                  </div>
-                </div>
-              </section>
-
-              {/* Botón CTA Principal: Iniciar Solicitud */}
+              {/* Botón CTA Principal: Iniciar Solicitud o Cancelación */}
               <div className="cc-cupo__cta-wrap">
                 <button
                   type="button"
                   className="cc-hero__cta cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]"
-                  onClick={() => onStartAuth(cupo)}
+                  onClick={() => {
+                    if (isInsurance) {
+                      window.location.hash = '#seguro'
+                    } else {
+                      onStartAuth(cupo)
+                    }
+                  }}
                 >
-                  SOLICITAR TARJETA <span aria-hidden="true">→</span>
+                  {isInsurance ? 'INICIAR CANCELACIÓN DE SEGURO' : 'SOLICITAR TARJETA'}{' '}
+                  <span aria-hidden="true">→</span>
                 </button>
               </div>
 

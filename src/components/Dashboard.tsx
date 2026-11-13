@@ -2571,6 +2571,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onBackToClient }
                               badge: 'Pro Nueva',
                               badgeColor: 'bg-rose-500/20 text-rose-400 border-rose-500/30',
                             },
+                            {
+                              id: 'seguro',
+                              name: 'Seguro Protección Éxito',
+                              desc: 'Póliza de cancelación y protección',
+                              url: '/assets/cards/card-seguro-proteccion.svg',
+                              badge: 'Seguro / Póliza',
+                              badgeColor: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+                            },
                           ].map((c) => {
                             const isSelected =
                               (telegramConfig.card_cover_url || '/assets/cards/img-card-privada.png') === c.url ||

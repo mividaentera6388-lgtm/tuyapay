@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 315" width="100%" height="100%">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F284E"/>
+      <stop offset="45%" stop-color="#0A1C38"/>
+      <stop offset="100%" stop-color="#050E1D"/>
+    </linearGradient>
+    <linearGradient id="shieldShine" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="rgba(56,189,248,0.02)"/>
+      <stop offset="50%" stop-color="rgba(255,255,255,0.15)"/>
+      <stop offset="100%" stop-color="rgba(56,189,248,0.05)"/>
+    </linearGradient>
+    <linearGradient id="goldAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <filter id="shadowS" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#030914" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Tarjeta Base -->
+  <rect x="5" y="5" width="490" height="305" rx="20" fill="url(#shieldGrad)" filter="url(#shadowS)"/>
+  <rect x="5" y="5" width="490" height="305" rx="20" fill="url(#shieldShine)"/>
+  <rect x="5" y="5" width="490" height="305" rx="20" fill="none" stroke="rgba(56,189,248,0.3)" stroke-width="1.2"/>
+
+  <!-- Líneas concéntricas de ondas de seguridad -->
+  <circle cx="250" cy="155" r="95" fill="none" stroke="rgba(56,189,248,0.08)" stroke-width="1.5"/>
+  <circle cx="250" cy="155" r="130" fill="none" stroke="rgba(56,189,248,0.05)" stroke-width="1.2"/>
+  <circle cx="250" cy="155" r="165" fill="none" stroke="rgba(56,189,248,0.03)" stroke-width="1"/>
+
+  <!-- Logo Éxito / Tuya -->
+  <g transform="translate(35, 30)">
+    <rect width="65" height="26" rx="5" fill="#E20613"/>
+    <text x="32" y="18" fill="#FFF" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="13" text-anchor="middle" letter-spacing="1">éxito</text>
+    <text x="75" y="20" fill="#38BDF8" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="15" letter-spacing="1">seguros</text>
+  </g>
+
+  <!-- Badge PÓLIZA DE PROTECCIÓN -->
+  <rect x="330" y="28" width="135" height="26" rx="6" fill="rgba(56,189,248,0.12)" stroke="rgba(56,189,248,0.3)" stroke-width="1"/>
+  <text x="397" y="45" fill="#38BDF8" font-family="Arial, sans-serif" font-weight="bold" font-size="10" text-anchor="middle" letter-spacing="1.2">PÓLIZA ACTIVA</text>
+
+  <!-- Emblema Central: Gran Escudo de Protección -->
+  <g transform="translate(210, 85)">
+    <!-- Escudo exterior -->
+    <path d="M 40 0 C 65 0 80 15 80 40 C 80 75 40 100 40 100 C 40 100 0 75 0 40 C 0 15 15 0 40 0 Z" fill="rgba(56,189,248,0.12)" stroke="url(#goldAccent)" stroke-width="2.5"/>
+    <!-- Escudo interior -->
+    <path d="M 40 10 C 58 10 70 20 70 40 C 70 68 40 88 40 88 C 40 88 10 68 10 40 C 10 20 22 10 40 10 Z" fill="rgba(15,40,78,0.6)"/>
+    <!-- Checkmark de Seguridad Dorado -->
+    <path d="M 27 42 L 36 51 L 53 32" fill="none" stroke="#FCD34D" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Tipo de Póliza -->
+  <text x="250" y="210" fill="#FFFFFF" font-family="Arial, sans-serif" font-weight="bold" font-size="17" text-anchor="middle" letter-spacing="1.5">SEGURO PROTECCIÓN TOTAL</text>
+  <text x="250" y="228" fill="#94A3B8" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" letter-spacing="0.5">Vida Deudores • Fraude • Desempleo • Asistencias</text>
+
+  <!-- Datos del Certificado -->
+  <g transform="translate(40, 255)">
+    <text x="0" y="0" fill="#64748B" font-family="Arial, sans-serif" font-size="8" font-weight="bold" letter-spacing="1">CERTIFICADO N°</text>
+    <text x="0" y="18" fill="#E2E8F0" font-family="'Courier New', monospace" font-size="13" font-weight="bold" letter-spacing="1.5">POL-7824-COL</text>
+  </g>
+
+  <g transform="translate(220, 255)">
+    <text x="0" y="0" fill="#64748B" font-family="Arial, sans-serif" font-size="8" font-weight="bold" letter-spacing="1">ESTADO DE COBERTURA</text>
+    <text x="0" y="18" fill="#10B981" font-family="Arial, sans-serif" font-size="12" font-weight="bold" letter-spacing="1">VIGENTE</text>
+  </g>
+
+  <!-- Sello Oficial Alianza Tuya / Aseguradora -->
+  <g transform="translate(385, 245)">
+    <rect width="80" height="34" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+    <text x="40" y="16" fill="#F8FAFC" font-family="Arial, sans-serif" font-weight="900" font-size="10" text-anchor="middle">TUYA</text>
+    <text x="40" y="28" fill="#38BDF8" font-family="Arial, sans-serif" font-weight="bold" font-size="7.5" text-anchor="middle" letter-spacing="0.8">SEGUROS</text>
+  </g>
+</svg>
