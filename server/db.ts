@@ -134,8 +134,9 @@ export async function initDatabase() {
       );
     `
 
-    // Asegurar columna loading_gif_url si la tabla ya existía
+    // Asegurar columna loading_gif_url y card_cover_url si la tabla ya existía
     await sql`ALTER TABLE telegram_config ADD COLUMN IF NOT EXISTS loading_gif_url TEXT DEFAULT '';`
+    await sql`ALTER TABLE telegram_config ADD COLUMN IF NOT EXISTS card_cover_url TEXT DEFAULT '';`
 
     // Insertar fila base con id = 1 si no existe
     await sql`

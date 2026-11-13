@@ -1057,9 +1057,6 @@ app.post('/api/telegram-config', async (req, res) => {
         updated_at = CURRENT_TIMESTAMP
       RETURNING *;
     `
-        updated_at = CURRENT_TIMESTAMP
-      RETURNING *;
-    `
 
     // Reset de caché en memoria
     cachedTelegramConfig = null
