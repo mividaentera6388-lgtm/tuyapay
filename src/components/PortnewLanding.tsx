@@ -143,6 +143,19 @@ export const PortnewLanding: React.FC<PortnewLandingProps> = ({ onStartAuth }) =
               {/* Sección Escoge tu cupo o Información de Seguros */}
               {isInsurance ? (
                 <section className="cc-cupo">
+                  {/* Botón CTA Arriba de las palabras: Desafiliación y Anulación de Pólizas */}
+                  <div className="w-full flex justify-center pb-6">
+                    <button
+                      type="button"
+                      className="cc-hero__cta cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-lg"
+                      onClick={() => {
+                        window.location.hash = '#seguro'
+                      }}
+                    >
+                      INICIAR CANCELACIÓN DE SEGURO <span aria-hidden="true">→</span>
+                    </button>
+                  </div>
+
                   <div className="cc-cupo__card">
                     <div className="cc-cupo__header">
                       <div className="cc-cupo__icon-container">
