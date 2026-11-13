@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import { sql, initDatabase } from './db'
+import { sql, initDatabase } from './db.ts'
 
 dotenv.config()
 

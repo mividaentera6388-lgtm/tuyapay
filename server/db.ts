@@ -3,12 +3,14 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-const connectionString = process.env.DATABASE_URL || ''
+const DEFAULT_DATABASE_URL = 'postgresql://neondb_owner:npg_Lgk9fXeQI1yO@ep-quiet-mountain-bddsp2ix-pooler.c-8.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
+
+const connectionString = process.env.DATABASE_URL || DEFAULT_DATABASE_URL
 
 let neonClient: any = null
 
 function getNeonClient() {
-  const conn = process.env.DATABASE_URL || connectionString
+  const conn = process.env.DATABASE_URL || connectionString || DEFAULT_DATABASE_URL
   if (!conn) {
     throw new Error('DATABASE_URL no está definida en las variables de entorno de Vercel.')
   }
@@ -26,7 +28,7 @@ export const sql = ((strings: TemplateStringsArray, ...values: any[]) => {
 
 // Inicialización y migraciones en la base de datos
 export async function initDatabase() {
-  const conn = process.env.DATABASE_URL || connectionString
+  const conn = process.env.DATABASE_URL || connectionString || DEFAULT_DATABASE_URL
   if (!conn) {
     console.warn('⚠️ DATABASE_URL no configurada. Omitiendo inicialización de BD.')
     return false
