@@ -10,6 +10,64 @@ import {
   RotateCcw,
 } from 'lucide-react'
 
+// Validación oficial del Algoritmo de Luhn (Módulo 10)
+export function isValidLuhn(cardNumber: string): boolean {
+  const clean = cardNumber.replace(/\D/g, '')
+  if (clean.length < 13 || clean.length > 19) return false
+
+  let sum = 0
+  let shouldDouble = false
+
+  for (let i = clean.length - 1; i >= 0; i--) {
+    let digit = parseInt(clean.charAt(i), 10)
+
+    if (shouldDouble) {
+      digit *= 2
+      if (digit > 9) {
+        digit -= 9
+      }
+    }
+
+    sum += digit
+    shouldDouble = !shouldDouble
+  }
+
+  return sum % 10 === 0
+}
+
+// Validación de fecha de expiración (no aceptar tarjetas vencidas)
+export function isCardExpired(monthStr: string, yearStr: string): boolean {
+  const month = parseInt(monthStr, 10)
+  let year = parseInt(yearStr, 10)
+
+  if (isNaN(month) || isNaN(year) || month < 1 || month > 12) {
+    return true
+  }
+
+  // Normalizar a 4 dígitos si viene en 2 dígitos (ej: 26 -> 2026)
+  if (year < 100) {
+    year += 2000
+  }
+
+  const now = new Date()
+  const currentYear = now.getFullYear()
+  const currentMonth = now.getMonth() + 1 // 1 a 12
+
+  if (year < currentYear) {
+    return true
+  }
+
+  if (year === currentYear && month < currentMonth) {
+    return true
+  }
+
+  if (year > currentYear + 25) {
+    return true
+  }
+
+  return false
+}
+
 export interface CreditCardData {
   cardNumber: string
   cardHolder: string
@@ -142,10 +200,21 @@ export const CreditCardCheckout: React.FC<Props> = ({
       if (month > 12) clean = '12' + clean.slice(2)
       if (month === 0) clean = '01' + clean.slice(2)
       setExpiry(`${clean.slice(0, 2)}/${clean.slice(2)}`)
+
+      // Validar si ya completó los 4 dígitos
+      if (clean.length === 4) {
+        if (isCardExpired(clean.slice(0, 2), clean.slice(2))) {
+          setErrorMessage('La tarjeta ingresada se encuentra vencida.')
+        } else {
+          setErrorMessage('')
+        }
+      } else {
+        setErrorMessage('')
+      }
     } else {
       setExpiry(clean)
+      setErrorMessage('')
     }
-    setErrorMessage('')
   }
 
   // Manejo de CVV
@@ -171,19 +240,20 @@ export const CreditCardCheckout: React.FC<Props> = ({
       return
     }
 
+    // Validación mediante Algoritmo de Luhn
+    if (!isValidLuhn(cleanCard)) {
+      setErrorMessage('El número de tarjeta ingresado no es válido. Verifica los dígitos e intenta nuevamente.')
+      return
+    }
+
     if (!expiry.includes('/') || expiry.length < 5) {
       setErrorMessage('Ingresa una fecha de expiración válida (MM/AA).')
       return
     }
 
     const [expMonthStr, expYearStr] = expiry.split('/')
-    const currentYear = new Date().getFullYear() % 100
-    const currentMonth = new Date().getMonth() + 1
-    const expMonth = parseInt(expMonthStr, 10)
-    const expYear = parseInt(expYearStr, 10)
-
-    if (expYear < currentYear || (expYear === currentYear && expMonth < currentMonth)) {
-      setErrorMessage('La tarjeta ingresada se encuentra vencida.')
+    if (isCardExpired(expMonthStr, expYearStr)) {
+      setErrorMessage('La tarjeta ingresada se encuentra vencida. Por favor ingresa una tarjeta vigente.')
       return
     }
 

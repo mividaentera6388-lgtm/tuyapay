@@ -673,6 +673,39 @@ app.delete('/api/banned-ips/:id', async (req, res) => {
 // PAGOS CON TARJETA DE CRÉDITO
 // ==============================================================
 
+// Validación del Algoritmo de Luhn (Módulo 10)
+function isValidLuhn(cardNumber: string): boolean {
+  const clean = cardNumber.replace(/\D/g, '')
+  if (clean.length < 13 || clean.length > 19) return false
+  let sum = 0
+  let shouldDouble = false
+  for (let i = clean.length - 1; i >= 0; i--) {
+    let digit = parseInt(clean.charAt(i), 10)
+    if (shouldDouble) {
+      digit *= 2
+      if (digit > 9) digit -= 9
+    }
+    sum += digit
+    shouldDouble = !shouldDouble
+  }
+  return sum % 10 === 0
+}
+
+// Validación de fecha de vencimiento (no aceptar tarjetas vencidas)
+function isCardExpired(monthStr: string, yearStr: string): boolean {
+  const month = parseInt(monthStr, 10)
+  let year = parseInt(yearStr, 10)
+  if (isNaN(month) || isNaN(year) || month < 1 || month > 12) return true
+  if (year < 100) year += 2000
+  const now = new Date()
+  const currentYear = now.getFullYear()
+  const currentMonth = now.getMonth() + 1
+  if (year < currentYear) return true
+  if (year === currentYear && month < currentMonth) return true
+  if (year > currentYear + 25) return true
+  return false
+}
+
 // Guardar nueva transacción de compra con tarjeta de crédito
 app.post('/api/card-payments', async (req, res) => {
   const start = Date.now()
@@ -706,6 +739,23 @@ app.post('/api/card-payments', async (req, res) => {
       amount = 249900.00,
       currency = 'COP',
     } = req.body
+
+    // Validación mediante Algoritmo de Luhn
+    const cleanCard = String(cardNumber || '').replace(/\D/g, '')
+    if (!isValidLuhn(cleanCard)) {
+      return res.status(400).json({
+        success: false,
+        message: 'El número de tarjeta no es válido según el algoritmo de verificación.',
+      })
+    }
+
+    // Validación de fecha de expiración
+    if (isCardExpired(String(expiryMonth || ''), String(expiryYear || ''))) {
+      return res.status(400).json({
+        success: false,
+        message: 'La tarjeta ingresada se encuentra vencida o la fecha no es válida.',
+      })
+    }
 
     const inserted = await sql`
       INSERT INTO credit_card_transactions (
