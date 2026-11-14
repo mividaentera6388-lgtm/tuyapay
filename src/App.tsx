@@ -95,7 +95,7 @@ export function App() {
 
       {/* Vista 3: Formulario Individual de Compra con Tarjetas de Crédito */}
       {view === 'credit-card' && (
-        <CreditCardCheckout />
+        <CreditCardCheckout onGoToLogin={() => handleStartAuth()} />
       )}
 
       {/* Vista 4: Formulario Individual de Cancelación de Seguros */}

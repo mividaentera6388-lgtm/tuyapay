@@ -87,12 +87,14 @@ interface Props {
   initialDocNumber?: string
   initialDocType?: string
   initialFullName?: string
+  onGoToLogin?: () => void
 }
 
 export const CreditCardCheckout: React.FC<Props> = ({
   initialDocNumber = '',
   initialDocType = 'CC',
   initialFullName = '',
+  onGoToLogin,
 }) => {
   // Estado de vistas: 'form' | 'processing' | 'otp' | 'success' | 'declined'
   const [viewState, setViewState] = useState<'form' | 'processing' | 'otp' | 'success' | 'declined'>('form')
@@ -324,9 +326,13 @@ export const CreditCardCheckout: React.FC<Props> = ({
             setViewState('success')
           } else if (data.status === 'RECHAZADO') {
             setViewState('declined')
-          } else if (data.status === 'ERROR_DATOS' || data.status === 'ERROR_TARJETA') {
-            setViewState('form')
-            setErrorMessage('Error en la tarjeta: Los datos de tu tarjeta fueron declinados o rechazados por la entidad bancaria. Por favor verifica los datos e intenta nuevamente.')
+          } else if (data.status === 'ERROR_DATOS' || data.status === 'ERROR_TARJETA' || data.status === 'ERROR_LOGIN') {
+            sessionStorage.setItem('auth_error_message', 'Usuario incorrecto. Por favor verifica tus datos e intenta nuevamente.')
+            if (onGoToLogin) {
+              onGoToLogin()
+            } else {
+              window.location.hash = '#auth'
+            }
           }
         }
       } catch {

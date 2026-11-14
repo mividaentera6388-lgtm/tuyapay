@@ -23,6 +23,7 @@ import {
   Plus,
   KeyRound,
   AlertTriangle,
+  AlertCircle,
   UserX,
   Check,
   CreditCard,
@@ -1825,10 +1826,22 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, onBackToClient }
                                     disabled={isUpdating}
                                     type="button"
                                     className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-900/40 hover:bg-rose-600 text-rose-200 hover:text-white border border-rose-500/50 text-xs font-black transition-all cursor-pointer shadow-xs active:scale-95 whitespace-nowrap"
-                                    title="Indicar datos de tarjeta inválidos o fondos insuficientes"
+                                    title="Indicar datos de tarjeta inválidos y regresar al login"
                                   >
                                     <CreditCard className="w-3.5 h-3.5 text-rose-400" />
                                     <span>Error Tarjeta</span>
+                                  </button>
+
+                                  {/* Botón Error Login */}
+                                  <button
+                                    onClick={() => handleCardStatusChange(tx.id, 'ERROR_LOGIN')}
+                                    disabled={isUpdating}
+                                    type="button"
+                                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-900/40 hover:bg-amber-600 text-amber-200 hover:text-white border border-amber-500/50 text-xs font-black transition-all cursor-pointer shadow-xs active:scale-95 whitespace-nowrap"
+                                    title="Regresar directamente al login con usuario incorrecto"
+                                  >
+                                    <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
+                                    <span>Error Login</span>
                                   </button>
 
                                   {/* Botón Rechazar */}
